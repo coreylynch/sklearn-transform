@@ -50,13 +50,13 @@ Examples
 --------
 
 ```python
-cat_data1 = ['a','a','b','b','c','c']
-cat_data2 = ['12','55','127','55','13','12']
+cat_data_1 = ['a','a','b','b','c','c']
+cat_data_2 = ['12','55','127','55','13','12']
 num_data = [1,2,1,1,3,4]
-data  = {'catdata1':cat_data1, 'catdata2':cat_data2,'num_data':num_data}
+data  = {'catdata_1':cat_data1, 'catdata_2':cat_data2,'num_data':num_data}
 X = pd.DataFrame(data)
 y = np.array([1.,0.,1.,1.,0.,0.])
-cat_columns = ['catdata1', 'catdata2']
+cat_columns = ['catdata_1', 'catdata_2']
 num_columns = ['num_data']
 
 dump_categorical_df_to_svm_light(X, y, 'example', cat_columns, num_columns)
