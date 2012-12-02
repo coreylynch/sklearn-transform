@@ -1,4 +1,4 @@
-Categorical DataFrames to Sparse SVM-Light Format
+#Categorical DataFrames to Sparse SVM-Light Format
 -------------------------------------------------
 Converts a categorical design matrix X to a sparse CSR matrix,
 then writes to SVM-lite format.
@@ -46,8 +46,8 @@ query_id : array-like, shape = [n_samples]
     Array containing pairwise preference constraints (qid in svmlight
     format).
 
- Examples
- --------
+Examples
+--------
 
  cat_data1 = ['a','a','b','b','c','c']
 cat_data2 = ['12','55','127','55','13','12']
