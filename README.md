@@ -49,7 +49,8 @@ query_id : array-like, shape = [n_samples]
 Examples
 --------
 
- cat_data1 = ['a','a','b','b','c','c']
+```python
+cat_data1 = ['a','a','b','b','c','c']
 cat_data2 = ['12','55','127','55','13','12']
 num_data = [1,2,1,1,3,4]
 data  = {'catdata1':cat_data1, 'catdata2':cat_data2,'num_data':num_data}
@@ -59,7 +60,8 @@ cat_columns = ['catdata1', 'catdata2']
 num_columns = ['num_data']
 
 dump_categorical_df_to_svm_light(X, y, 'example', cat_columns, num_columns)
-
+```
+```bash
 head example	
 1.000000 0:1.0000000000000000e+00 8:1.0000000000000000e+00 9:1.0000000000000000e+00
 0.000000 0:1.0000000000000000e+00 6:1.0000000000000000e+00 9:2.0000000000000000e+00
@@ -67,3 +69,4 @@ head example
 1.000000 2:1.0000000000000000e+00 6:1.0000000000000000e+00 9:1.0000000000000000e+00
 0.000000 1:1.0000000000000000e+00 7:1.0000000000000000e+00 9:3.0000000000000000e+00
 0.000000 1:1.0000000000000000e+00 8:1.0000000000000000e+00 9:4.0000000000000000e+00
+```
