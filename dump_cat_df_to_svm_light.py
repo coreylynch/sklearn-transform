@@ -21,11 +21,60 @@ def convert_to_one_hot(X,cat_columns):
 		prev_max += col_max
 	return X
 
+def categorical_df_to_csr(X, y, cat_columns, num_columns=None):
+	"""Converts a categorical DataFrame X to a sparse CSR matrix.
+	
+	This takes a pandas DataFrame with categorical features and converts category
+	values to a sparse one-hot representation.
+	
+	Parameters
+	----------
+	X : pandas DataFrame, shape = [n_samples, n_features]
+	    Training vectors, where n_samples is the number of samples and
+	    n_features is the number of features.
+
+	y : array-like, shape = [n_samples]
+	    Target values.
+
+	cat_columns: array-like
+		List of categorical columns
+
+	num_columns: array-like, optional
+		List of numerical columns
+
+	Returns
+	-------
+	sparse_X : sparse CSR matrix
+		Sparse vectorized version of categorical DataFrame
+	"""
+	X = convert_to_one_hot(X,cat_columns)
+	cat_col_indexes = np.concatenate([X[i] for i in X[cat_columns]])
+	if len(cat_columns)>1:
+		cat_rows = np.concatenate([X.index for i in range(len(cat_columns))])
+	else:
+		cat_rows = X.index
+	max_col_value = X.max()[cat_columns[-1]]
+	data = np.ones(len(cat_col_indexes))
+	if num_columns is None:
+		sparse_X = csr_matrix((data,(cat_rows,cat_col_indexes)))
+	else:
+		num_col_indexes = [np.array([max_col_value+i]*len(X.index)) for i in range(len(num_columns))]
+		if len(num_columns)>1:
+			num_rows = [X.index for i in range(len(num_columns))]
+			all_col_indexes = np.concatenate((cat_col_indexes, num_col_indexes))	
+		else:
+			num_rows = X.index
+			all_col_indexes = np.concatenate((cat_col_indexes, num_col_indexes[0]))
+		rows = np.concatenate((cat_rows,num_rows))
+		num_data = np.concatenate([X[i] for i in X[num_columns]])
+		data = np.concatenate((data, num_data))
+		sparse_X = csr_matrix((data,(rows,all_col_indexes)))
+	return sparse_X
 
 def dump_categorical_df_to_svm_light(X, y, filename, cat_columns,
-									num_columns=None, zero_based=True,
-									comment=None, query_id=None):
-	"""Converts a categorical design matrix X to a sparse CSR matrix,
+									 num_columns=None, zero_based=True,
+									 comment=None, query_id=None):
+	"""Converts a categorical DataFrame X to a sparse CSR matrix,
 	then writes to SVM-lite format.
 
 	This takes a pandas DataFrame with categorical features, converts category
@@ -73,8 +122,8 @@ def dump_categorical_df_to_svm_light(X, y, filename, cat_columns,
 
     Examples
     --------
-    import pandas as pd
-    import numpy as np
+	import pandas as pd
+	import numpy as np
 
 	category_data_1 = ['tcp','udp','udp','tcp','dns','tcp']
 	category_data_2 = ['red','blue','red','green','blue','red']
@@ -100,29 +149,10 @@ def dump_categorical_df_to_svm_light(X, y, filename, cat_columns,
 	0.000000 1:1.0000000000000000e+00 2:1.0000000000000000e+00 4:3.0000000000000000e+00
 	0.000000 2:1.0000000000000000e+00 4:5.0000000000000000e+00
 	"""
-
-	X = convert_to_one_hot(X,cat_columns)
-	cat_col_indexes = np.concatenate([X[i] for i in X[cat_columns]])
-	if len(cat_columns)>1:
-		cat_rows = np.concatenate([X.index for i in range(len(cat_columns))])
-	else:
-		cat_rows = X.index
-	max_col_value = X.max()[cat_columns[-1]]
-	data = np.ones(len(cat_col_indexes))
 	if num_columns is None:
-		sparse_X = csr_matrix((data,(cat_rows,cat_col_indexes)))
+		sparse_X = categorical_df_to_csr(X, y, cat_columns)
 	else:
-		num_col_indexes = [np.array([max_col_value+i]*len(X.index)) for i in range(len(num_columns))]
-		if len(num_columns)>1:
-			num_rows = [X.index for i in range(len(num_columns))]
-			all_col_indexes = np.concatenate((cat_col_indexes, num_col_indexes))	
-		else:
-			num_rows = X.index
-			all_col_indexes = np.concatenate((cat_col_indexes, num_col_indexes[0]))
-		rows = np.concatenate((cat_rows,num_rows))
-		num_data = np.concatenate([X[i] for i in X[num_columns]])
-		data = np.concatenate((data, num_data))
-		sparse_X = csr_matrix((data,(rows,all_col_indexes)))
+		sparse_X = categorical_df_to_csr(X, y, cat_columns,num_columns)
 	dump_svmlight_file(sparse_X,y,filename)
 
 
