@@ -11,8 +11,7 @@ def map_cat_to_index(X,column):
 
 def convert_to_one_hot(X,cat_columns):
 	for column in cat_columns:
-		if X[column].dtype != 'int64':
-			X[column] = map_cat_to_index(X,column)
+		X[column] = map_cat_to_index(X,column)
 
 	prev_max = max(X[cat_columns[0]])
 	for column in cat_columns[1:]:
@@ -58,9 +57,10 @@ def categorical_df_to_csr(X, y, cat_columns, num_columns=None):
 	if num_columns is None:
 		sparse_X = csr_matrix((data,(cat_rows,cat_col_indexes)))
 	else:
-		num_col_indexes = [np.array([max_col_value+i]*len(X.index)) for i in range(len(num_columns))]
+		num_col_indexes = np.array([max_col_value+i for i in range(len(X.index)) for j in range(len(num_columns))])
 		if len(num_columns)>1:
-			num_rows = [X.index for i in range(len(num_columns))]
+			#num_rows = [X.index for i in range(len(num_columns))]
+			num_rows = np.array([i for i in X.index for j in range(len(num_columns))])
 			all_col_indexes = np.concatenate((cat_col_indexes, num_col_indexes))	
 		else:
 			num_rows = X.index
